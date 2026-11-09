@@ -50,7 +50,7 @@ De functies draaien in Frankfurt (`fra1`). Dat staat vast in `vercel.json`, zoda
 | `AUTH_SECRET` | Een willekeurige lange tekst, bijvoorbeeld de uitkomst van `openssl rand -base64 32` |
 | `AUTH_MICROSOFT_ENTRA_ID_ID` | Application (client) ID |
 | `AUTH_MICROSOFT_ENTRA_ID_SECRET` | De client secret (*Value*) |
-| `AUTH_MICROSOFT_ENTRA_ID_ISSUER` | `https://login.microsoftonline.com/<TENANT-ID>/v2.0` |
+| `AUTH_MICROSOFT_ENTRA_ID_ISSUER` | `https://login.microsoftonline.com/<TENANT-ID>/v2.0/` |
 | `ALLOWED_EMAIL_DOMAINS` | `workxadvocaten.nl` |
 
 Alleen collega's met een account in jullie tenant **en** een e-mailadres op het toegestane domein kunnen inloggen. Wil je de toegang tot een groep beperken, zet dan in Entra ID bij de app (Enterprise applications) **Assignment required** aan en wijs de juiste gebruikers of groep toe.
