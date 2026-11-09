@@ -1,5 +1,5 @@
 import { deleteDoc, putDoc } from "../../../../../lib/db";
-import { currentUser, json } from "../../../../../lib/session";
+import { apiUser, json } from "../../../../../lib/session";
 
 export const dynamic = "force-dynamic";
 const MAX_BYTES = 900_000;
@@ -11,8 +11,8 @@ function check(collection, id) {
 }
 
 export async function PUT(req, { params }) {
-  const user = await currentUser();
-  if (!user) return json({ error: "Niet ingelogd", code: "auth" }, 401);
+  const [user, denied] = await apiUser();
+  if (denied) return denied;
   const { collection, id } = await params;
   if (!check(collection, id)) return json({ error: "Onbekend document", code: "invalid_argument" }, 400);
   const raw = await req.text();
@@ -31,8 +31,8 @@ export async function PUT(req, { params }) {
 }
 
 export async function DELETE(req, { params }) {
-  const user = await currentUser();
-  if (!user) return json({ error: "Niet ingelogd", code: "auth" }, 401);
+  const [user, denied] = await apiUser();
+  if (denied) return denied;
   const { collection, id } = await params;
   if (collection !== "dossiers" || !check(collection, id)) return json({ error: "Onbekend document", code: "invalid_argument" }, 400);
   try {

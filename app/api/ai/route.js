@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { currentUser, json } from "../../../lib/session";
+import { apiUser, json } from "../../../lib/session";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 120;
@@ -53,8 +53,8 @@ function parseJson(text) {
 }
 
 export async function POST(req) {
-  const user = await currentUser();
-  if (!user) return json({ error: "Niet ingelogd", code: "auth" }, 401);
+  const [user, denied] = await apiUser();
+  if (denied) return denied;
   if (!client) return json({ error: "Claude is niet ingesteld", code: "ai_disabled" }, 503);
   let body;
   try { body = await req.json(); } catch { return json({ error: "Ongeldig verzoek", code: "invalid_request" }, 400); }

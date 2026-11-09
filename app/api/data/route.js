@@ -1,11 +1,11 @@
 import { listAll, storageMode } from "../../../lib/db";
-import { currentUser, json } from "../../../lib/session";
+import { apiUser, json } from "../../../lib/session";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const user = await currentUser();
-  if (!user) return json({ error: "Niet ingelogd", code: "auth" }, 401);
+  const [user, denied] = await apiUser();
+  if (denied) return denied;
   try {
     const rows = await listAll();
     const dossiers = rows.filter(r => r.collection === "dossiers").map(r => r.data);

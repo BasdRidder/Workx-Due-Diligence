@@ -1,42 +1,19 @@
 import NextAuth from "next-auth";
-import MicrosoftEntraID from "next-auth/providers/microsoft-entra-id";
+import Credentials from "next-auth/providers/credentials";
+import { authConfig } from "./auth.config";
+import { verifyLogin } from "./lib/users";
 
-const allowedDomains = (process.env.ALLOWED_EMAIL_DOMAINS || "")
-  .split(",").map(s => s.trim().toLowerCase()).filter(Boolean);
-
-// Inloggen overslaan kan alleen lokaal; in productie (ook op Vercel) wordt dit genegeerd.
-export const authDisabled = process.env.AUTH_DISABLED === "true" && process.env.NODE_ENV !== "production";
-
-export function emailAllowed(email) {
-  const e = String(email || "").toLowerCase();
-  if (!allowedDomains.length) return !!e;
-  return allowedDomains.some(d => e.endsWith("@" + d));
-}
+export { authDisabled } from "./auth.config";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  ...authConfig,
   providers: [
-    MicrosoftEntraID({
-      clientId: process.env.AUTH_MICROSOFT_ENTRA_ID_ID,
-      clientSecret: process.env.AUTH_MICROSOFT_ENTRA_ID_SECRET,
-      issuer: process.env.AUTH_MICROSOFT_ENTRA_ID_ISSUER,
-      // Eigen profielkoppeling: Microsoft vult `email` niet altijd, `preferred_username` bevat dan het werkadres.
-      // Geen profielfoto ophalen; die zou in de sessiecookie terechtkomen.
-      profile(p) {
-        return {
-          id: p.sub || p.oid,
-          name: p.name || p.preferred_username,
-          email: String(p.email || p.preferred_username || p.upn || "").toLowerCase(),
-          image: null
-        };
+    Credentials({
+      credentials: { email: { label: "E-mailadres" }, password: { label: "Wachtwoord", type: "password" } },
+      async authorize(credentials) {
+        const u = await verifyLogin(credentials?.email, credentials?.password);
+        return u ? { id: u.email, email: u.email, name: u.name } : null;
       }
     })
-  ],
-  pages: { signIn: "/login", error: "/login" },
-  session: { strategy: "jwt", maxAge: 60 * 60 * 12 },
-  trustHost: true,
-  callbacks: {
-    signIn({ user, profile }) {
-      return emailAllowed(user?.email || profile?.email || profile?.preferred_username);
-    }
-  }
+  ]
 });

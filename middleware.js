@@ -1,5 +1,8 @@
+import NextAuth from "next-auth";
 import { NextResponse } from "next/server";
-import { auth, authDisabled } from "./auth";
+import { authConfig, authDisabled } from "./auth.config";
+
+const { auth } = NextAuth(authConfig);
 
 export default auth(req => {
   if (authDisabled || req.auth?.user) return;

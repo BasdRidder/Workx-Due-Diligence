@@ -8,13 +8,13 @@ Interne tool van Workx advocaten voor arbeidsrechtelijke due diligence:
 - **Bibliotheek**: gedeelde know-how. Per onderwerp de standaardteksten, het informatieverzoek en standaardbevindingen.
 - **Claude-hulp** (optioneel): bevindingen herschrijven en een concept-samenvatting maken.
 
-Techniek: Next.js op Vercel, Neon Postgres voor de gegevens, Microsoft-login via Auth.js, Anthropic API voor de Claude-hulp.
+Techniek: Next.js op Vercel, Neon Postgres voor de gegevens, eigen accounts (e-mail en wachtwoord) via Auth.js, Anthropic API voor de Claude-hulp.
 
 ---
 
 ## Online zetten op Vercel
 
-Reken op ongeveer 30 minuten. Voor stap 4 heb je iemand nodig met beheerrechten in Microsoft 365 / Entra ID.
+Reken op ongeveer 20 minuten.
 
 ### 1. Code in GitHub
 
@@ -34,26 +34,29 @@ De functies draaien in Frankfurt (`fra1`). Dat staat vast in `vercel.json`, zoda
 2. Kies regio **Frankfurt (eu-central-1)** en koppel de database aan het project, voor alle omgevingen.
 3. Vercel zet `DATABASE_URL` dan automatisch. De tabel maakt de app bij het eerste gebruik zelf aan.
 
-### 4. Inloggen met Microsoft
+### 4. Inloggen instellen
 
-1. Ga in de Azure-portal naar **Microsoft Entra ID → App registrations → New registration**.
-   - Naam: `Workx Due Diligence`
-   - Accounttype: **Accounts in this organizational directory only** (alleen jullie eigen tenant)
-   - Redirect URI (type *Web*): `https://<jullie-domein>/api/auth/callback/microsoft-entra-id`
-     (bijvoorbeeld `https://workx-dd.vercel.app/api/auth/callback/microsoft-entra-id`)
-2. Noteer op de overzichtspagina de **Application (client) ID** en de **Directory (tenant) ID**.
-3. Maak onder **Certificates & secrets → New client secret** een secret aan en noteer de *Value*.
-4. Zet in Vercel onder **Settings → Environment Variables**:
+De tool heeft eigen accounts: e-mailadres en wachtwoord, beheerd in de app.
+
+1. Zet in Vercel onder **Settings → Environment Variables** (Environment: *Production*):
 
 | Naam | Waarde |
 |---|---|
-| `AUTH_SECRET` | Een willekeurige lange tekst, bijvoorbeeld de uitkomst van `openssl rand -base64 32` |
-| `AUTH_MICROSOFT_ENTRA_ID_ID` | Application (client) ID |
-| `AUTH_MICROSOFT_ENTRA_ID_SECRET` | De client secret (*Value*) |
-| `AUTH_MICROSOFT_ENTRA_ID_ISSUER` | `https://login.microsoftonline.com/<TENANT-ID>/v2.0/` |
-| `ALLOWED_EMAIL_DOMAINS` | `workxadvocaten.nl` |
+| `AUTH_SECRET` | Een lange willekeurige tekst, bijvoorbeeld van generate-secret.vercel.app/32 |
+| `ADMIN_EMAIL` | Jouw e-mailadres. Dit wordt het eerste beheerdersaccount |
+| `ADMIN_PASSWORD` | Een startwachtwoord van minstens 12 tekens |
 
-Alleen collega's met een account in jullie tenant **en** een e-mailadres op het toegestane domein kunnen inloggen. Wil je de toegang tot een groep beperken, zet dan in Entra ID bij de app (Enterprise applications) **Assignment required** aan en wijs de juiste gebruikers of groep toe.
+2. Redeploy (zie stap 6) en log in met `ADMIN_EMAIL` en `ADMIN_PASSWORD`. De app maakt dan het beheerdersaccount aan en vraagt je direct een eigen wachtwoord te kiezen.
+3. Daarna kun je `ADMIN_PASSWORD` in Vercel verwijderen. Het werkt alleen zolang er nog geen accounts bestaan.
+4. Via **Gebruikers** (links onderin de tool) voeg je collega's toe. De app toont dan een tijdelijk wachtwoord; geef dat persoonlijk of via een apart kanaal door. Bij de eerste keer inloggen kiest de collega een eigen wachtwoord.
+
+Beveiliging:
+- Wachtwoorden worden alleen versleuteld opgeslagen (scrypt).
+- Na 5 mislukte pogingen wordt een account 15 minuten geblokkeerd.
+- Een sessie verloopt na 12 uur.
+- Een gedeactiveerd of verwijderd account heeft direct geen toegang meer.
+
+Wachtwoord vergeten? Een beheerder geeft via **Gebruikers → Nieuw wachtwoord** een nieuw tijdelijk wachtwoord.
 
 ### 5. Claude-hulp (optioneel)
 
@@ -72,7 +75,7 @@ Kies in Vercel **Deployments → … → Redeploy**, zodat de nieuwe instellinge
 
 ### 7. Eigen domein (optioneel)
 
-Voeg onder **Settings → Domains** bijvoorbeeld `dd.workxadvocaten.nl` toe en zet bij jullie domeinbeheerder het CNAME-record dat Vercel noemt. Pas daarna de redirect URI in Entra ID aan naar het nieuwe domein.
+Voeg onder **Settings → Domains** bijvoorbeeld `dd.workxadvocaten.nl` toe en zet bij jullie domeinbeheerder het CNAME-record dat Vercel noemt.
 
 ---
 
@@ -95,7 +98,7 @@ npm install
 cp .env.example .env.local
 ```
 
-Zet in `.env.local` voor een snelle start alleen `AUTH_DISABLED=true` en `AUTH_SECRET=lokaal`. Zonder `DATABASE_URL` bewaart de app gegevens in het geheugen, tot de server herstart.
+Zet in `.env.local` voor een snelle start alleen `AUTH_DISABLED=true` en `AUTH_SECRET=lokaal`, of `ADMIN_EMAIL` en `ADMIN_PASSWORD` om het inloggen te testen. Zonder `DATABASE_URL` bewaart de app gegevens in het geheugen, tot de server herstart.
 
 ```bash
 npm run dev
@@ -114,7 +117,8 @@ npm run dev
 | `app/api/data` | Alle dossiers, instellingen en bibliotheek ophalen |
 | `app/api/docs/[collection]/[id]` | Eén dossier of de instellingen/bibliotheek opslaan of verwijderen |
 | `app/api/ai` | Claude-hulp. De prompts worden op de server opgebouwd |
-| `auth.js`, `middleware.js` | Microsoft-login; elke pagina en API-route vereist een ingelogde gebruiker |
-| `lib/db.js` | Database (één tabel `dd_docs` met JSON-documenten) |
+| `auth.js`, `auth.config.js`, `middleware.js` | Inloggen; elke pagina en API-route vereist een ingelogde gebruiker |
+| `lib/users.js`, `app/beheer`, `app/account` | Accounts, wachtwoorden en gebruikersbeheer |
+| `lib/db.js` | Database: `dd_docs` (dossiers, instellingen, bibliotheek) en `dd_users` (accounts) |
 
 Elke wijziging die je naar de hoofdbranch van de repository pusht, zet Vercel automatisch online. Een pull request krijgt een eigen preview-URL.
