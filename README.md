@@ -34,14 +34,17 @@ De functies draaien in Frankfurt (`fra1`). Dat staat vast in `vercel.json`, zoda
 2. Kies regio **Frankfurt (eu-central-1)** en koppel de database aan het project, voor alle omgevingen.
 3. Vercel zet `DATABASE_URL` dan automatisch. De tabel maakt de app bij het eerste gebruik zelf aan.
 
-### 4. Inloggen instellen
+### 4. Inloggen instellen (kan later)
 
-De tool heeft eigen accounts: e-mailadres en wachtwoord, beheerd in de app.
+**Standaard staat inloggen uit.** Dan kan iedereen met de link de tool openen en wijzigen, en toont de tool bovenin een waarschuwing. Gebruik in die fase geen echte cliëntgegevens.
+
+Inloggen aanzetten: de tool heeft eigen accounts (e-mailadres en wachtwoord, beheerd in de app). Je verzint zelf het e-mailadres en startwachtwoord voor het eerste beheerdersaccount.
 
 1. Zet in Vercel onder **Settings → Environment Variables** (Environment: *Production*):
 
 | Naam | Waarde |
 |---|---|
+| `LOGIN_ENABLED` | `true` |
 | `AUTH_SECRET` | Een lange willekeurige tekst, bijvoorbeeld van generate-secret.vercel.app/32 |
 | `ADMIN_EMAIL` | Jouw e-mailadres. Dit wordt het eerste beheerdersaccount |
 | `ADMIN_PASSWORD` | Een startwachtwoord van minstens 12 tekens |

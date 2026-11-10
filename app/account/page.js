@@ -3,10 +3,13 @@ import { currentUser } from "../../lib/session";
 import { MIN_PASSWORD } from "../../lib/users";
 import PasswordForm from "./PasswordForm";
 
+import { authDisabled } from "../../auth";
+
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Account · Workx Due Diligence" };
 
 export default async function AccountPage() {
+  if (authDisabled) redirect("/");
   const user = await currentUser();
   if (!user) redirect("/login");
   return (

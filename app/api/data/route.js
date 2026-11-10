@@ -20,6 +20,7 @@ export async function GET() {
     });
   } catch (e) {
     console.error("data GET", e);
+    if (String(e?.message || "").startsWith("DATABASE_URL")) return json({ error: "Er is nog geen database gekoppeld.", code: "database_missing" }, 503);
     return json({ error: "De database is niet bereikbaar.", code: "unavailable" }, 503);
   }
 }

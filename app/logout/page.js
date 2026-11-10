@@ -1,9 +1,13 @@
+import { redirect } from "next/navigation";
 import { signOut } from "../../auth";
+
+import { authDisabled } from "../../auth";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Uitloggen · Workx Due Diligence" };
 
 export default function LogoutPage() {
+  if (authDisabled) redirect("/");
   return (
     <main className="login">
       <div className="login-card">

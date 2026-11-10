@@ -4,6 +4,8 @@ import { listUsers } from "../../lib/users";
 import { updateUser } from "./actions";
 import { AddUserForm, ResetForm } from "./forms";
 
+import { authDisabled } from "../../auth";
+
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Gebruikers · Workx Due Diligence" };
 
@@ -21,6 +23,7 @@ function Op({ email, op, label, danger, confirm }) {
 }
 
 export default async function BeheerPage() {
+  if (authDisabled) redirect("/");
   const me = await currentUser();
   if (!me) redirect("/login");
   if (me.mustChange) redirect("/account");
