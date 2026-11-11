@@ -9,7 +9,7 @@ export default function DDApp() {
     <>
       <div className="app">
         <aside className="side" id="side" />
-        <main id="main"><div className="wrap"><p className="muted">Laden…</p></div></main>
+        <main id="main"><div id="topbar" className="topbar" /><div id="view"><div className="wrap"><p className="muted">Laden…</p></div></div></main>
       </div>
       <div className="toast" id="toast" hidden />
     </>
