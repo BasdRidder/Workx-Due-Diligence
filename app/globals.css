@@ -220,3 +220,31 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--focus);outline-o
 .login-card .row .btn{width:auto}
 .notice code{background:var(--surface);padding:2px 6px;border-radius:4px}
 a.btn{color:inherit;text-decoration:none}
+
+/* Rapport in Workx-stijl (handleiding/pitch) */
+.paper .r-running{font-size:10px;letter-spacing:.32em;color:var(--paper-muted);margin:-28px 0 28px;text-transform:uppercase}
+.paper .r-mark{background:var(--paper-mark);color:inherit;padding:0 2px}
+.paper .r-small{font-size:11px;color:var(--paper-muted)}
+.paper table.r-workx{border-collapse:collapse}
+.paper table.r-workx th{background:none;font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--paper-muted);border:0;border-bottom:1px solid var(--paper-line)}
+.paper table.r-workx td{border:0;border-bottom:1px solid var(--paper-line);padding:9px 8px}
+.paper table.r-workx td div+div{margin-top:6px}
+.paper table.r-workx u{text-underline-offset:2px}
+/* Handleiding en selectie per onderwerp */
+details.man>summary{display:flex;align-items:baseline;gap:12px;cursor:pointer;list-style:none}
+details.man>summary::-webkit-details-marker{display:none}
+details.man>summary::before{content:"›";display:inline-block;transition:transform .15s;color:var(--muted)}
+details.man[open]>summary::before{transform:rotate(90deg)}
+details.man[open]>summary{margin-bottom:12px}
+.man-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.man-block ul,.man-block ol,.man-steps{margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:13px}
+.man-block+.man-block{margin-top:12px}
+.pick-group{display:flex;flex-direction:column;gap:6px}
+.pick-group+.pick-group{margin-top:14px}
+.pick{border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.pick.on{border-color:var(--fg);background:var(--surface-2)}
+.pick-main{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;cursor:pointer}
+.pick-main input{width:16px;height:16px;margin-top:3px;accent-color:var(--fg);flex:none}
+.pick-text{display:flex;flex-direction:column;gap:2px;min-width:0}
+.pick-prev{font-size:12.5px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pick-ask{padding:0 12px 10px}

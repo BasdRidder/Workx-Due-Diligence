@@ -14,6 +14,7 @@ export async function GET() {
       dossiers,
       settings: config.settings || null,
       library: config.library?.topics || null,
+      libraryVersion: config.library?.version || 1,
       user,
       storage: storageMode,
       aiEnabled: !!process.env.ANTHROPIC_API_KEY
